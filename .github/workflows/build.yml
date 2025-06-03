@@ -2,9 +2,8 @@ name: Build and Release
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*'  # v1.0.0, v1.1.0 などのタグ時のみ実行
 
 permissions:
   contents: write
@@ -51,5 +50,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --verbose
-          includeRelease: false
+          tagName: v__VERSION__
+          releaseName: 'Texture Utility Tools v__VERSION__'
+          releaseBody: 'See the assets to download and install this version.'
+          releaseDraft: true
+          prerelease: false

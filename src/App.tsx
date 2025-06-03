@@ -7,7 +7,6 @@ import {
   Toolbar,
   Typography,
   Container,
-  Grid2 as Grid,
   Card,
   CardContent,
   CardActionArea,
@@ -15,7 +14,8 @@ import {
   Paper,
   Button,
   IconButton,
-  styled
+  styled,
+  Grid
 } from '@mui/material'
 import {
   ContentCut,
@@ -42,7 +42,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+    fontFamily: '"Noto Sans JP", "Segoe UI", "Helvetica Neue", Arial, sans-serif',
   },
   components: {
     MuiCard: {
@@ -192,7 +192,7 @@ function App() {
           {!selectedTool ? (
             <Grid container spacing={3}>
               {tools.map((tool) => (
-                <Grid xs={12} sm={6} md={3} key={tool.id}>
+                <Grid item xs={12} sm={6} md={3} key={tool.id}>
                   <Card>
                     <CardActionArea
                       onClick={() => setSelectedTool(tool.id as Tool)}

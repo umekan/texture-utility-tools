@@ -8,7 +8,6 @@ import {
   Typography,
   Container,
   Card,
-  CardContent,
   CardActionArea,
   Box,
   Paper,
@@ -26,6 +25,10 @@ import {
   CloudUpload,
   Image as ImageIcon
 } from '@mui/icons-material'
+import CropTool from './components/CropTool'
+import ResizeTool from './components/ResizeTool'
+import ConvertTool from './components/ConvertTool'
+import DiffTool from './components/DiffTool'
 
 const theme = createTheme({
   palette: {
@@ -77,7 +80,7 @@ const GradientBackground = styled(Box)({
   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
 })
 
-const DropZone = styled(Paper)(({ theme, isDragOver }: { theme?: any; isDragOver: boolean }) => ({
+const DropZone = styled(Paper)(({ isDragOver }: { isDragOver: boolean }) => ({
   border: `2px dashed ${isDragOver ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.4)'}`,
   borderRadius: 12,
   padding: theme.spacing(4),
@@ -91,12 +94,6 @@ const DropZone = styled(Paper)(({ theme, isDragOver }: { theme?: any; isDragOver
   cursor: 'pointer',
 }))
 
-const PreviewImage = styled('img')({
-  maxWidth: '100%',
-  maxHeight: 300,
-  borderRadius: 8,
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-})
 
 type Tool = 'crop' | 'diff' | 'resize' | 'convert' | null
 
@@ -229,51 +226,50 @@ function App() {
                 </Typography>
               </Box>
 
-              <DropZone
-                isDragOver={isDragOver}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => document.getElementById('file-input')?.click()}
-              >
-                {draggedFile ? (
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h6" gutterBottom>
-                      選択されたファイル: {draggedFile.name}
-                    </Typography>
-                    <PreviewImage 
-                      src={URL.createObjectURL(draggedFile)} 
-                      alt="Preview" 
-                    />
-                  </Box>
-                ) : (
-                  <Box sx={{ textAlign: 'center' }}>
-                    <CloudUpload sx={{ fontSize: 64, mb: 2, opacity: 0.6 }} />
-                    <Typography variant="h6" gutterBottom>
-                      画像ファイルをドラッグ&ドロップ
-                    </Typography>
-                    <Typography variant="body1" sx={{ mb: 3, opacity: 0.8 }}>
-                      または下のボタンからファイルを選択してください
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      startIcon={<CloudUpload />}
-                      size="large"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ファイルを選択
-                    </Button>
-                  </Box>
-                )}
-              </DropZone>
+              {draggedFile ? (
+                <>
+                  {selectedTool === 'crop' && <CropTool file={draggedFile} />}
+                  {selectedTool === 'resize' && <ResizeTool file={draggedFile} />}
+                  {selectedTool === 'convert' && <ConvertTool file={draggedFile} />}
+                  {selectedTool === 'diff' && <DiffTool file={draggedFile} />}
+                </>
+              ) : (
+                <>
+                  <DropZone
+                    isDragOver={isDragOver}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => document.getElementById('file-input')?.click()}
+                  >
+                    <Box sx={{ textAlign: 'center' }}>
+                      <CloudUpload sx={{ fontSize: 64, mb: 2, opacity: 0.6 }} />
+                      <Typography variant="h6" gutterBottom>
+                        画像ファイルをドラッグ&ドロップ
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 3, opacity: 0.8 }}>
+                        または下のボタンからファイルを選択してください
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        startIcon={<CloudUpload />}
+                        size="large"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        ファイルを選択
+                      </Button>
+                    </Box>
+                  </DropZone>
 
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
-                id="file-input"
-              />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    style={{ display: 'none' }}
+                    id="file-input"
+                  />
+                </>
+              )}
             </Paper>
           )}
         </Container>

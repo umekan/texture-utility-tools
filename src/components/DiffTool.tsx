@@ -125,7 +125,7 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={4}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -155,7 +155,7 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
         </Card>
       </Grid>
 
-      <Grid item xs={12} md={4}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -234,7 +234,7 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
         </Card>
       </Grid>
 
-      <Grid item xs={12} md={4}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -291,7 +291,7 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
       </Grid>
 
       {error && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Alert severity="error" onClose={() => setError('')}>
             {error}
           </Alert>
@@ -299,13 +299,13 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
       )}
 
       {originalInfo && secondInfo && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Alert severity="info">
             <Typography variant="body2">
               画像情報比較 - 
               画像1: {originalInfo.width}×{originalInfo.height} ({originalInfo.format.toUpperCase()}) | 
               画像2: {secondInfo.width}×{secondInfo.height} ({secondInfo.format.toUpperCase()})
-              {originalInfo.width !== secondInfo.width || originalInfo.height !== secondInfo.height && 
+              {(originalInfo.width !== secondInfo.width || originalInfo.height !== secondInfo.height) && 
                 ' - サイズが異なるため、大きい方に合わせてリサイズして比較します'}
             </Typography>
           </Alert>

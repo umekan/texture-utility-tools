@@ -100,7 +100,7 @@ const CropTool: React.FC<CropToolProps> = ({ file }) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -128,7 +128,7 @@ const CropTool: React.FC<CropToolProps> = ({ file }) => {
               トリミング範囲
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextField
                   label="X座標"
                   type="number"
@@ -139,7 +139,7 @@ const CropTool: React.FC<CropToolProps> = ({ file }) => {
                   inputProps={{ min: 0, max: imageInfo?.width || 0 }}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextField
                   label="Y座標"
                   type="number"
@@ -150,7 +150,7 @@ const CropTool: React.FC<CropToolProps> = ({ file }) => {
                   inputProps={{ min: 0, max: imageInfo?.height || 0 }}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextField
                   label="幅"
                   type="number"
@@ -161,7 +161,7 @@ const CropTool: React.FC<CropToolProps> = ({ file }) => {
                   inputProps={{ min: 1, max: imageInfo ? imageInfo.width - cropArea.x : 100 }}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextField
                   label="高さ"
                   type="number"
@@ -189,7 +189,7 @@ const CropTool: React.FC<CropToolProps> = ({ file }) => {
         </Card>
       </Grid>
 
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -241,7 +241,7 @@ const CropTool: React.FC<CropToolProps> = ({ file }) => {
       </Grid>
 
       {error && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Alert severity="error" onClose={() => setError('')}>
             {error}
           </Alert>

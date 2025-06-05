@@ -115,7 +115,7 @@ const ConvertTool: React.FC<ConvertToolProps> = ({ file }) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -181,7 +181,7 @@ const ConvertTool: React.FC<ConvertToolProps> = ({ file }) => {
               variant="contained"
               startIcon={isProcessing ? <CircularProgress size={20} /> : <Transform />}
               onClick={handleConvert}
-              disabled={isProcessing || (imageInfo && targetFormat === imageInfo.format.toLowerCase())}
+              disabled={isProcessing || (imageInfo ? targetFormat === imageInfo.format.toLowerCase() : false)}
               fullWidth
             >
               {isProcessing ? '変換中...' : 'フォーマット変換'}
@@ -196,7 +196,7 @@ const ConvertTool: React.FC<ConvertToolProps> = ({ file }) => {
         </Card>
       </Grid>
 
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -266,7 +266,7 @@ const ConvertTool: React.FC<ConvertToolProps> = ({ file }) => {
       </Grid>
 
       {error && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Alert severity="error" onClose={() => setError('')}>
             {error}
           </Alert>

@@ -189,7 +189,7 @@ function App() {
           {!selectedTool ? (
             <Grid container spacing={3}>
               {tools.map((tool) => (
-                <Grid item xs={12} sm={6} md={3} key={tool.id}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={tool.id}>
                   <Card>
                     <CardActionArea
                       onClick={() => setSelectedTool(tool.id as Tool)}

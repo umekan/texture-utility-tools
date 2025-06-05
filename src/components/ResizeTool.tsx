@@ -108,7 +108,7 @@ const ResizeTool: React.FC<ResizeToolProps> = ({ file }) => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -156,7 +156,7 @@ const ResizeTool: React.FC<ResizeToolProps> = ({ file }) => {
               カスタムサイズ
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextField
                   label="幅"
                   type="number"
@@ -167,7 +167,7 @@ const ResizeTool: React.FC<ResizeToolProps> = ({ file }) => {
                   inputProps={{ min: 1 }}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextField
                   label="高さ"
                   type="number"
@@ -204,7 +204,7 @@ const ResizeTool: React.FC<ResizeToolProps> = ({ file }) => {
         </Card>
       </Grid>
 
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -266,7 +266,7 @@ const ResizeTool: React.FC<ResizeToolProps> = ({ file }) => {
       </Grid>
 
       {error && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Alert severity="error" onClose={() => setError('')}>
             {error}
           </Alert>

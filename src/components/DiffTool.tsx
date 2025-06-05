@@ -10,7 +10,7 @@ import {
   Alert,
   Paper
 } from '@mui/material'
-import { Download, Compare, CloudUpload } from '@mui/icons-material'
+import { Download, Compare, CloudUpload, Edit } from '@mui/icons-material'
 import { compareImages, fileToBase64, base64ToDataUrl, downloadImage, getImageInfo, formatFileSize } from '../utils/imageUtils'
 import type { ProcessedImage, ImageInfo } from '../utils/imageUtils'
 
@@ -19,6 +19,7 @@ interface DiffToolProps {
 }
 
 const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
+  const [originalFile, setOriginalFile] = useState<File | null>(file)
   const [originalImage, setOriginalImage] = useState<string>('')
   const [secondImage, setSecondImage] = useState<string>('')
   const [secondFile, setSecondFile] = useState<File | null>(null)
@@ -29,12 +30,14 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
   const [error, setError] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [isSecondDragOver, setIsSecondDragOver] = useState(false)
 
   React.useEffect(() => {
     const loadImage = async () => {
+      if (!originalFile) return
       try {
         setIsLoading(true)
-        const base64 = await fileToBase64(file)
+        const base64 = await fileToBase64(originalFile)
         setOriginalImage(base64)
         const info = await getImageInfo(base64)
         setOriginalInfo(info)
@@ -46,7 +49,22 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
     }
 
     loadImage()
-  }, [file])
+  }, [originalFile])
+
+  const handleOriginalFileSelect = async (selectedFile: File) => {
+    if (!selectedFile.type.startsWith('image/')) {
+      setError('画像ファイルを選択してください')
+      return
+    }
+
+    try {
+      setOriginalFile(selectedFile)
+      setDiffImage(null) // 差分結果をクリア
+      setError('')
+    } catch {
+      setError('画像の読み込みに失敗しました')
+    }
+  }
 
   const handleSecondFileSelect = async (selectedFile: File) => {
     if (!selectedFile.type.startsWith('image/')) {
@@ -60,25 +78,46 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
       setSecondImage(base64)
       const info = await getImageInfo(base64)
       setSecondInfo(info)
+      setDiffImage(null) // 差分結果をクリア
       setError('')
     } catch {
       setError('2番目の画像の読み込みに失敗しました')
     }
   }
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleOriginalDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(true)
   }
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleOriginalDragLeave = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleOriginalDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
+    const files = Array.from(e.dataTransfer.files)
+    const imageFile = files.find(file => file.type.startsWith('image/'))
+    if (imageFile) {
+      handleOriginalFileSelect(imageFile)
+    }
+  }
+
+  const handleSecondDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsSecondDragOver(true)
+  }
+
+  const handleSecondDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsSecondDragOver(false)
+  }
+
+  const handleSecondDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsSecondDragOver(false)
     const files = Array.from(e.dataTransfer.files)
     const imageFile = files.find(file => file.type.startsWith('image/'))
     if (imageFile) {
@@ -86,7 +125,14 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
     }
   }
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOriginalFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0]
+    if (selectedFile) {
+      handleOriginalFileSelect(selectedFile)
+    }
+  }
+
+  const handleSecondFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
       handleSecondFileSelect(selectedFile)
@@ -110,8 +156,8 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
   }, [originalImage, secondImage])
 
   const handleDownload = () => {
-    if (diffImage && secondFile) {
-      downloadImage(diffImage.data, diffImage.format, `diff_${file.name.split('.')[0]}_vs_${secondFile.name.split('.')[0]}`)
+    if (diffImage && originalFile && secondFile) {
+      downloadImage(diffImage.data, diffImage.format, `diff_${originalFile.name.split('.')[0]}_vs_${secondFile.name.split('.')[0]}`)
     }
   }
 
@@ -136,7 +182,21 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
                 {originalInfo.width} × {originalInfo.height} | {formatFileSize(originalInfo.size_bytes)}
               </Typography>
             )}
-            <Box sx={{ textAlign: 'center', mb: 2 }}>
+            <Box 
+              sx={{ 
+                textAlign: 'center', 
+                mb: 2,
+                border: `2px dashed ${isDragOver ? 'rgba(255, 255, 255, 0.6)' : 'transparent'}`,
+                borderRadius: 2,
+                p: isDragOver ? 1 : 0,
+                cursor: 'pointer',
+                background: isDragOver ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+              }}
+              onDragOver={handleOriginalDragOver}
+              onDragLeave={handleOriginalDragLeave}
+              onDrop={handleOriginalDrop}
+              onClick={() => document.getElementById('original-file-input')?.click()}
+            >
               <img
                 src={base64ToDataUrl(originalImage, 'png')}
                 alt="Original"
@@ -144,13 +204,30 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
                   maxWidth: '100%',
                   maxHeight: 200,
                   borderRadius: 8,
-                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  pointerEvents: 'none'
                 }}
               />
             </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-              {file.name}
+            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 2 }}>
+              {originalFile?.name}
             </Typography>
+            <Button
+              variant="outlined"
+              startIcon={<Edit />}
+              onClick={() => document.getElementById('original-file-input')?.click()}
+              fullWidth
+              size="small"
+            >
+              画像を変更
+            </Button>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleOriginalFileInputChange}
+              style={{ display: 'none' }}
+              id="original-file-input"
+            />
           </CardContent>
         </Card>
       </Grid>
@@ -196,7 +273,7 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
             ) : (
               <Paper
                 sx={{
-                  border: `2px dashed ${isDragOver ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.4)'}`,
+                  border: `2px dashed ${isSecondDragOver ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.4)'}`,
                   borderRadius: 2,
                   p: 3,
                   textAlign: 'center',
@@ -205,11 +282,11 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  background: isDragOver ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+                  background: isSecondDragOver ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
                 }}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
+                onDragOver={handleSecondDragOver}
+                onDragLeave={handleSecondDragLeave}
+                onDrop={handleSecondDrop}
                 onClick={() => document.getElementById('second-file-input')?.click()}
               >
                 <Box>
@@ -226,7 +303,7 @@ const DiffTool: React.FC<DiffToolProps> = ({ file }) => {
             <input
               type="file"
               accept="image/*"
-              onChange={handleFileInputChange}
+              onChange={handleSecondFileInputChange}
               style={{ display: 'none' }}
               id="second-file-input"
             />
